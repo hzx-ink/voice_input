@@ -1,17 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-全局语音输入工具
-按住 Ctrl+Space 说话，松开后自动把识别出的文字粘贴到当前光标位置。
-
-资源占用设计（空闲时近乎为零）：
-- 全程事件驱动：键盘钩子 + 主线程挂起等待，无任何轮询，空闲时 CPU 占用 0%
-- 只在录音期间创建音频流，回调每 100ms 追加一次数据，开销极小
-- 识别使用 int8 量化的 faster-whisper 模型（CTranslate2 推理），内存约为原版的 1/4
-"""
-
 import os
-
-# 模型下载走国内镜像，必须放在导入 faster_whisper 之前
 os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 import threading
@@ -23,7 +10,7 @@ import keyboard
 import pyperclip
 from faster_whisper import WhisperModel
 
-# ---------------- 可按需修改的配置 ----------------
+#可按需修改的配置
 MODEL_SIZE = "base"    # 模型档位: tiny(最省内存最快) | base(推荐) | small(更准但更慢)
 LANGUAGE = "zh"        # 识别语言；改为 None 可自动检测中英文
 COMPUTE_TYPE = "int8"  # int8 量化，CPU 推理最省内存
@@ -31,7 +18,6 @@ SAMPLE_RATE = 16000    # Whisper 固定采样率
 HOTKEY_MOD = "ctrl"    # 组合键修饰键
 HOTKEY_KEY = "space"   # 组合键主键，与修饰键组合即 Ctrl+Space
 MIN_SECONDS = 0.3      # 短于该时长的录音直接忽略（防误触）
-# --------------------------------------------------
 
 model = None
 
